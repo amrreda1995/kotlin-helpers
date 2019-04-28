@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">KotlinHelpers</string>
+    <string name="error_while_fetching_data">Error while fetching data</string>
 </resources>

@@ -10,27 +10,7 @@ interface ValidatorInterface {
 
 class Validator : ValidatorInterface {
     override fun isPasswordStrong(password: String): Boolean {
-        var hasLetter = false
-        var hasDigit = false
-
-        if (password.length >= 8) {
-            for (i in 0 until password.length) {
-                val x = password[i]
-                if (Character.isLetter(x)) {
-                    hasLetter = true
-                } else if (Character.isDigit(x)) {
-                    hasDigit = true
-                }
-
-                // no need to check further, break the loop
-                if (hasLetter && hasDigit) {
-                    break
-                }
-            }
-            return hasLetter && hasDigit
-        } else {
-            return false
-        }
+        return password.matches("^(?=.*[A-Za-z])(?=.*[0-9]).{8,}\$".toRegex())
     }
 
     override fun isEmailValid(email: String): Boolean {

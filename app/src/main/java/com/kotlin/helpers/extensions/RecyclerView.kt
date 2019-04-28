@@ -1,4 +1,4 @@
-package com.kotlin.helpers.extensions.recyclerview
+package com.kotlin.helpers.extensions
 
 import androidx.recyclerview.widget.RecyclerView
 
@@ -34,7 +34,7 @@ fun RecyclerView.addScrollListenerForPagination(
                         }
                     }
                 }
-            } ?: kotlin.run {
+            } ?: run {
                 if (!recyclerView.canScrollVertically(direction)) {
                     block()
                 }

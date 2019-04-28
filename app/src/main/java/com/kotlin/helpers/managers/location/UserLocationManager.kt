@@ -11,14 +11,13 @@ import com.google.android.gms.maps.model.LatLng
 
 interface UserLocationManagerInterface {
     var latLong: MutableLiveData<LatLng>
-    fun getCurrentLocation()
+    fun getCurrentLocation(getUpdatesOfLocation: Boolean = false)
 }
 
-class UserLocationManager(
-    context: Context,
-    private val getUpdatesOfLocation: Boolean
-) : UserLocationManagerInterface,
+class UserLocationManager(context: Context) : UserLocationManagerInterface,
     LocationCallback() {
+
+    private var getUpdatesOfLocation: Boolean = false
 
     override var latLong = MutableLiveData<LatLng>()
 
@@ -32,7 +31,9 @@ class UserLocationManager(
     private var fusedLocationClient = FusedLocationProviderClient(context)
 
     @SuppressLint("MissingPermission")
-    override fun getCurrentLocation() {
+    override fun getCurrentLocation(getUpdatesOfLocation: Boolean) {
+        this.getUpdatesOfLocation = getUpdatesOfLocation
+
         fusedLocationClient.requestLocationUpdates(locationRequest, this, null)
     }
 

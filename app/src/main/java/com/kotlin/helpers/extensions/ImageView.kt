@@ -1,4 +1,4 @@
-package com.kotlin.helpers.extensions.imageview
+package com.kotlin.helpers.extensions
 
 import android.widget.ImageView
 import com.bumptech.glide.Glide

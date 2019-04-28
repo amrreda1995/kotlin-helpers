@@ -4,87 +4,37 @@ import android.content.Context
 import android.content.SharedPreferences
 
 interface SharedPreferencesManagerInterface {
-    fun putInt(map: HashMap<String, Int>)
-    fun getInt(key: String): Int?
-
-    fun putString(map: HashMap<String, String>)
-    fun getString(key: String): String?
-
-    fun putFloat(map: HashMap<String, Float>)
-    fun getFloat(key: String): Float?
-
-    fun putLong(map: HashMap<String, Long>)
-    fun getLong(key: String): Long?
-
-    fun putBoolean(key: String, checked: Boolean)
-    fun getBoolean(key: String): Boolean?
-
-    fun putStringSet(key: String, values: MutableSet<String>?)
-    fun getStringSet(key: String): MutableSet<String>?
+    fun <T> put(key: String, value: T)
+    fun <T> get(key: String, defaultValue: T): T
 }
 
-class SharedPreferencesManager(context: Context) : SharedPreferencesManagerInterface {
-
+@Suppress("UNCHECKED_CAST")
+class SharedPreferencesManager(context: Context) :
+    SharedPreferencesManagerInterface {
     private var sharedPreferences: SharedPreferences? =
         context.getSharedPreferences("preferencesData", Context.MODE_PRIVATE)
 
     private val editor = sharedPreferences?.edit()
 
-    override fun putFloat(map: HashMap<String, Float>) {
-        map.forEach { editor?.putFloat(it.key, it.value) }
-
-        editor?.apply()
+    override fun <T> put(key: String, value: T) {
+        when (value) {
+            is String -> editor?.putString(key, value)?.apply()
+            is Int -> editor?.putInt(key, value)?.apply()
+            is Float -> editor?.putFloat(key, value)?.apply()
+            is Long -> editor?.putLong(key, value)?.apply()
+            is Boolean -> editor?.putBoolean(key, value)?.apply()
+            else -> throw IllegalArgumentException("Not registered")
+        }
     }
 
-    override fun getFloat(key: String): Float? {
-        return sharedPreferences?.getFloat(key, 0f)
-    }
-
-    override fun putLong(map: HashMap<String, Long>) {
-        map.forEach { editor?.putLong(it.key, it.value) }
-
-        editor?.apply()
-    }
-
-    override fun getLong(key: String): Long? {
-        return sharedPreferences?.getLong(key, 1L)
-    }
-
-    override fun putBoolean(key: String, checked: Boolean) {
-        editor?.putBoolean(key, checked)
-        editor?.apply()
-    }
-
-    override fun getBoolean(key: String): Boolean? {
-        return sharedPreferences?.getBoolean(key, false)
-    }
-
-    override fun putStringSet(key: String, values: MutableSet<String>?) {
-        editor?.putStringSet(key, values)
-        editor?.apply()
-    }
-
-    override fun getStringSet(key: String): MutableSet<String>? {
-        return sharedPreferences?.getStringSet(key, null)
-    }
-
-    override fun putInt(map: HashMap<String, Int>) {
-        map.forEach { editor?.putInt(it.key, it.value) }
-
-        editor?.apply()
-    }
-
-    override fun getInt(key: String): Int? {
-        return sharedPreferences?.getInt(key, -1)
-    }
-
-    override fun putString(map: HashMap<String, String>) {
-        map.forEach { editor?.putString(it.key, it.value) }
-
-        editor?.apply()
-    }
-
-    override fun getString(key: String): String? {
-        return sharedPreferences?.getString(key, null)
+    override fun <T> get(key: String, defaultValue: T): T {
+        return when (defaultValue) {
+            is String -> sharedPreferences?.getString(key, defaultValue as String) as T
+            is Int -> sharedPreferences?.getInt(key, defaultValue as Int) as T
+            is Float -> sharedPreferences?.getFloat(key, defaultValue as Float) as T
+            is Long -> sharedPreferences?.getLong(key, defaultValue as Long) as T
+            is Boolean -> sharedPreferences?.getBoolean(key, defaultValue as Boolean) as T
+            else -> throw IllegalArgumentException("Not registered")
+        }
     }
 }
