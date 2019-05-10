@@ -5,41 +5,41 @@ import com.google.gson.Gson
 import com.kotlin.helpers.R
 import com.kotlin.helpers.models.Message
 import com.kotlin.helpers.models.ResponseResult
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
+import okhttp3.Headers
 import retrofit2.Response
 
 interface ApiRequestManagerInterface {
-    fun <T : Any> execute(
-        apiRequest: suspend () -> Response<T>,
-        onSuccess: ((data: T) -> Unit)? = null,
-        onFailure: ((errorMessage: String) -> Unit)? = null,
+    fun <T> execute(
+        request: suspend () -> Response<T>,
+        onSuccess: ((T, Headers) -> Unit)? = null,
+        onFailure: ((Message) -> Unit)? = null,
         finally: (() -> Unit)? = null
-    )
+    ): Job
 }
 
 class ApiRequestManager(private val resources: Resources) : ApiRequestManagerInterface {
-    override fun <T : Any> execute(
-        apiRequest: suspend () -> Response<T>,
-        onSuccess: ((data: T) -> Unit)?,
-        onFailure: ((errorMessage: String) -> Unit)?,
+
+    override fun <T> execute(
+        request: suspend () -> Response<T>,
+        onSuccess: ((T, Headers) -> Unit)?,
+        onFailure: ((Message) -> Unit)?,
         finally: (() -> Unit)?
-    ) {
-        CoroutineScope(Dispatchers.IO).launch {
+    ): Job {
+        return CoroutineScope(Dispatchers.IO).launch {
             try {
-                val result = verifyResponse(apiRequest.invoke())
+                val response = request.invoke()
+                val result = verifyResponse(response)
 
                 withContext(Dispatchers.Main) {
                     when (result) {
-                        is ResponseResult.Success -> onSuccess?.invoke(result.data)
+                        is ResponseResult.Success -> onSuccess?.invoke(result.data, response.headers())
                         is ResponseResult.Failure -> onFailure?.invoke(result.message)
                     }
                 }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
-                    onFailure?.invoke(resources.getString(R.string.error_while_fetching_data))
+                    onFailure?.invoke(Message(resources.getString(R.string.something_went_wrong)))
                 }
             } finally {
                 withContext(Dispatchers.Main) {
@@ -49,7 +49,7 @@ class ApiRequestManager(private val resources: Resources) : ApiRequestManagerInt
         }
     }
 
-    private fun <T : Any> verifyResponse(response: Response<T>): ResponseResult<T> {
+    private fun <T> verifyResponse(response: Response<T>): ResponseResult<T> {
         return try {
             if (response.isSuccessful) {
                 if (response.code() == 204) {
@@ -59,15 +59,12 @@ class ApiRequestManager(private val resources: Resources) : ApiRequestManagerInt
                     ResponseResult.Success(response.body()!!)
                 }
             } else {
-                ResponseResult.Failure(
-                    Gson().fromJson(
-                        response.errorBody()?.string(),
-                        Message::class.java
-                    ).message
-                )
+                val message = Gson().fromJson(response.errorBody()?.string(), Message::class.java)
+                message.statusCode = response.code()
+                ResponseResult.Failure(message)
             }
         } catch (ex: Exception) {
-            ResponseResult.Failure(ex.localizedMessage)
+            ResponseResult.Failure(Message(ex.localizedMessage))
         }
     }
 }

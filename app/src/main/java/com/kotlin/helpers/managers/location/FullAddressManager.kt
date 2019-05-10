@@ -3,6 +3,7 @@ package com.kotlin.helpers.managers.location
 import android.content.Context
 import android.location.Geocoder
 import androidx.lifecycle.MutableLiveData
+import com.kotlin.helpers.R
 import com.kotlin.helpers.enums.LanguageCode
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -14,15 +15,11 @@ interface FullAddressManagerInterface {
     var fullAddress: MutableLiveData<String>
 
     fun getFullAddressOfLocation(
-        latitude: Double,
-        longitude: Double,
-        inLanguageCode: LanguageCode = LanguageCode.EN
+        latitude: Double, longitude: Double, inLanguageCode: LanguageCode = LanguageCode.EN
     )
 }
 
-class FullAddressManager(
-    private val context: Context
-) : FullAddressManagerInterface {
+class FullAddressManager(val context: Context) : FullAddressManagerInterface {
 
     override var fullAddress = MutableLiveData<String>()
 
@@ -31,15 +28,22 @@ class FullAddressManager(
     private var geocoder = Geocoder(context, Locale(chosenLanguage.code))
 
     override fun getFullAddressOfLocation(latitude: Double, longitude: Double, inLanguageCode: LanguageCode) {
-        if (inLanguageCode != chosenLanguage) {
-            geocoder = Geocoder(context, Locale(inLanguageCode.code))
-            chosenLanguage = inLanguageCode
-        }
-
         CoroutineScope(Dispatchers.IO).launch {
-            val fullAddress = getAddressUsingGeocoder(latitude, longitude)
-            withContext(Dispatchers.Main) {
-                this@FullAddressManager.fullAddress.value = fullAddress
+            try {
+                val fullAddress = getAddressUsingGeocoder(latitude, longitude)
+
+                withContext(Dispatchers.Main) {
+                    fullAddress?.let {
+                        this@FullAddressManager.fullAddress.value = fullAddress
+                    } ?: run {
+                        this@FullAddressManager.fullAddress.value = context.getString(R.string.no_address_found)
+                    }
+                }
+            } catch (ex: Exception) {
+//                Log.e("hhh", ex.message)
+                withContext(Dispatchers.Main) {
+                    this@FullAddressManager.fullAddress.value = context.getString(R.string.no_address_found)
+                }
             }
         }
     }
@@ -64,8 +68,6 @@ class FullAddressManager(
                     }
                     .joinToString(", ")
             }
-
-            return firstAddress?.getAddressLine(0)
         }
 
         return null

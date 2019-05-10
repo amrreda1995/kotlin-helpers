@@ -1,3 +1,5 @@
 package com.kotlin.helpers.models
 
-data class Message(var message: String)
+import com.google.gson.annotations.SerializedName
+
+data class Message(@SerializedName("message") var errorMessage: String = "", var statusCode: Int = 0)

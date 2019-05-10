@@ -4,28 +4,18 @@ import android.content.Context
 import android.location.LocationManager
 
 interface LocationFacadeManagerInterface {
-    fun getLocationServicesManager(): LocationManager
-    fun getUserLocationManager(): UserLocationManagerInterface
-    fun getFullAddressManager(): FullAddressManagerInterface
+    val locationServicesManager: LocationManager
+
+    val userLocationManager: UserLocationManager
+
+    val fullAddressManager: FullAddressManager
 }
 
-class LocationFacadeManager(context: Context) : LocationFacadeManagerInterface {
+class LocationFacadeManager(val context: Context) : LocationFacadeManagerInterface {
 
-    private val locationServicesManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+    override val locationServicesManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
 
-    private val userLocationManager = UserLocationManager(context)
+    override val userLocationManager = UserLocationManager(context)
 
-    private val fullAddressManager = FullAddressManager(context)
-
-    override fun getLocationServicesManager(): LocationManager {
-        return locationServicesManager
-    }
-
-    override fun getUserLocationManager(): UserLocationManagerInterface {
-        return userLocationManager
-    }
-
-    override fun getFullAddressManager(): FullAddressManagerInterface {
-        return fullAddressManager
-    }
+    override val fullAddressManager = FullAddressManager(context)
 }
