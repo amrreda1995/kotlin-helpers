@@ -49,7 +49,6 @@ class FullAddressManager(val context: Context) : FullAddressManagerInterface {
                     }
                 }
             } catch (ex: Exception) {
-//                Log.e("hhh", ex.message)
                 withContext(Dispatchers.Main) {
                     this@FullAddressManager.fullAddress.value = context.getString(R.string.no_address_found)
                 }
