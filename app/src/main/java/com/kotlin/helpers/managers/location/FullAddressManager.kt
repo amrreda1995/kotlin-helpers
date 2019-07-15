@@ -4,12 +4,21 @@ import android.content.Context
 import android.location.Geocoder
 import androidx.lifecycle.MutableLiveData
 import com.kotlin.helpers.R
-import com.kotlin.helpers.enums.LanguageCode
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.*
+
+/**
+ * @FullAddressManager class helps you get the full address of specific latitude, longitude of a location
+ * @Note that you have to setup and observer for its liveData "fullAddress" because you will receive
+ * the full address through it
+ * */
+
+enum class LanguageCode(val code: String) {
+    EN("en"), AR("ar")
+}
 
 interface FullAddressManagerInterface {
     var fullAddress: MutableLiveData<String>

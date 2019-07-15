@@ -5,7 +5,12 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.PopupMenu
 
+/**
+ * This class helps you to build a menu for a view using builder design pattern
+ * */
+
 class PopupMenuBuilder(context: Context, view: View) {
+
     private var menu: PopupMenu = PopupMenu(context, view)
 
     fun inflate(menuId: Int): PopupMenuBuilder {

@@ -9,13 +9,20 @@ import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.maps.model.LatLng
 
+/**
+ * @UserLocationManager class helps you get the latitude, longitude of the current location
+ * @Note that you have to setup and observer for its liveData "latLong" because you will receive
+ * the LatLng through it
+ * */
+
 interface UserLocationManagerInterface {
+
     var latLong: MutableLiveData<LatLng>
+
     fun getCurrentLocation(getUpdatesOfLocation: Boolean = false)
 }
 
-class UserLocationManager(context: Context) : UserLocationManagerInterface,
-    LocationCallback() {
+class UserLocationManager(context: Context) : UserLocationManagerInterface, LocationCallback() {
 
     private var getUpdatesOfLocation: Boolean = false
 
@@ -28,6 +35,7 @@ class UserLocationManager(context: Context) : UserLocationManagerInterface,
         locationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
         locationRequest
     }
+
     private var fusedLocationClient = FusedLocationProviderClient(context)
 
     @SuppressLint("MissingPermission")

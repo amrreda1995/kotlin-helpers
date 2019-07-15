@@ -2,6 +2,12 @@ package com.kotlin.helpers.extensions
 
 import androidx.recyclerview.widget.RecyclerView
 
+/**
+ * If you don't use RecyclerViewBuilder library; and you need to implement a pagination for your
+ * recyclerView; of course you will need to trigger if your recyclerView reaches to its bottom or not
+ * This extension will help you to implement this task
+ * */
+
 fun RecyclerView.addScrollListenerForPagination(
     orientation: Int? = null,
     reverseLayout: Boolean? = null,

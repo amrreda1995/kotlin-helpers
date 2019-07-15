@@ -3,12 +3,15 @@ package com.kotlin.helpers.managers
 import android.content.Context
 import android.net.ConnectivityManager
 
+/**
+ * @InternetConnectionManager class helps you check for your internet connection
+ * */
+
 interface InternetConnectionManagerInterface {
     val isConnectedToInternet: Boolean
 }
 
-class InternetConnectionManager(val context: Context) :
-    InternetConnectionManagerInterface {
+class InternetConnectionManager(val context: Context) : InternetConnectionManagerInterface {
 
     override val isConnectedToInternet: Boolean
         get() {
