@@ -42,8 +42,9 @@ class RuntimePermissionsManager : RuntimePermissionsManagerInterface {
         } else {
             context?.let {
                 ActivityCompat.requestPermissions(it as Activity, permissions, requestCode)
-                requestPermissionsResult.invoke(false, requestCode)
             }
+
+            requestPermissionsResult.invoke(false, requestCode)
         }
     }
 
